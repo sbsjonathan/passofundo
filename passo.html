@@ -135,7 +135,6 @@
     table{
       width:100%;
       border-collapse:collapse;
-      /* Aumentei min-width para caber a coluna Hora sem espremer */
       min-width: 600px; 
     }
 
@@ -188,7 +187,6 @@
       box-shadow:0 0 0 4px var(--focus);
     }
     
-    /* Estilo especifico para input de hora */
     input[type="time"]::-webkit-calendar-picker-indicator {
       filter: invert(1);
       opacity: 0.6;
@@ -198,7 +196,7 @@
     .col-tipo{ min-width: 80px; }
     .col-valor{ min-width: 90px; }
     .col-litros{ min-width: 90px; }
-    .col-hora{ min-width: 95px; } /* Nova coluna */
+    .col-hora{ min-width: 95px; }
 
     .typeWrap{
       display:flex;
@@ -206,25 +204,32 @@
       align-items:center;
     }
 
+    /* Ajuste visual do seletor para alinhar perfeitamente */
     .seg{
-      display:inline-flex;
+      display:flex; /* Flex para esticar os botões */
+      width: 100%;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.05);
       border-radius:10px;
       overflow:hidden;
-      min-height:36px;
+      height:36px; /* Altura fixa igual ao input */
     }
     .seg button{
+      flex: 1; /* Faz os botões dividirem o espaço igualmente */
       border:none;
       background:transparent;
-      padding:6px 10px;
+      padding:0;
       font-weight:800;
       font-size:12px;
-      min-width:38px;
       border-radius:0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .seg button.on{
       background:rgba(124,77,255,.22);
+      color: #fff;
       box-shadow: inset 0 0 0 1px rgba(124,77,255,.45);
     }
 
@@ -277,9 +282,15 @@
       font-size:13px;
       font-weight:800;
     }
-    /* Alvo para os labels */
     .totalLabel{ color:var(--muted); font-weight:700; }
     .totalRow .num{ font-variant-numeric: tabular-nums; }
+
+    /* Separador visual para os calculos finais */
+    .sep-top{
+      padding-top:8px;
+      margin-top:2px;
+      border-top:1px solid rgba(255,255,255,.10);
+    }
 
     @media (max-width: 520px){
       .wrap{ max-width: 520px; }
@@ -329,7 +340,6 @@
           <span class="num" id="totalComb">R$ 0,00</span>
         </div>
         <div class="totalRow">
-          <!-- Labels com IDs para atualizar o texto (X abastecimentos) -->
           <span class="totalLabel" id="lblLitros">Total litros</span>
           <span class="num" id="totalLitros">0,00 L</span>
         </div>
@@ -337,16 +347,27 @@
           <span class="totalLabel" id="lblPed">Total pedágio</span>
           <span class="num" id="totalPed">R$ 0,00</span>
         </div>
-        <div class="totalRow" style="padding-top:6px;border-top:1px solid rgba(255,255,255,.10);">
+        
+        <div class="totalRow sep-top">
           <span class="totalLabel">Total geral</span>
           <span class="num" id="totalGeral">R$ 0,00</span>
         </div>
+        
+        <!-- Novos totais solicitados -->
+        <div class="totalRow" style="color:var(--good);">
+          <span class="totalLabel" style="color:rgba(29,209,161,.8);">Valor individual (÷7)</span>
+          <span class="num" id="valIndividual">R$ 0,00</span>
+        </div>
+        <div class="totalRow" style="color:var(--accent);">
+          <span class="totalLabel" style="color:rgba(124,77,255,.8);">Valor por casal (×2)</span>
+          <span class="num" id="valCasal">R$ 0,00</span>
+        </div>
+
       </div>
     </div>
   </div>
 
   <script>
-    // Atualizado com itens 13-16 e campo Hora vazio por padrão
     const DEFAULT_ROWS = [
       { local: "Seropedica",          tipo: "P", valor: "16,40", litros: "", hora: "" },
       { local: "Itatiaia",            tipo: "P", valor: "14,50", litros: "", hora: "" },
@@ -362,23 +383,26 @@
       { local: "Miracatu",            tipo: "P", valor: "4,30",   litros: "", hora: "" },
       { local: "Juquia",              tipo: "P", valor: "4,30",   litros: "", hora: "" },
       { local: "Cajati",              tipo: "P", valor: "4,30",   litros: "", hora: "" },
-      { local: "Barra do Turvo - SP", tipo: "P", valor: "4,30",   litros: "", hora: "" },
-      { local: "Antonina - PR",       tipo: "C", valor: "182,40", litros: "36,12", hora: "" }
+      { local: "Barra do Turvo - SP", tipo: "P", valor: "4,30",   litros: "", hora: "06:15" },
+      { local: "Antonina - PR",       tipo: "C", valor: "182,40", litros: "36,12", hora: "07:35" },
+      { local: "Campina Grande",      tipo: "P", valor: "4,30",   litros: "", hora: "08:03" },
+      { local: "Lapa",                tipo: "P", valor: "12,30",  litros: "", hora: "11:05" },
+      { local: "Rio Sul - PR",        tipo: "C", valor: "165,02", litros: "34,45", hora: "13:35" }
     ];
 
-    const STORAGE_KEY = "controle_gastos_v6"; // v6
+    const STORAGE_KEY = "controle_gastos_v7"; // Atualizado para v7
 
     const tbody = document.getElementById("tbody");
     
-    // Elementos de Valor
+    // Elementos de totais
     const totalComb = document.getElementById("totalComb");
     const totalPed = document.getElementById("totalPed");
     const totalGeral = document.getElementById("totalGeral");
     const totalLitros = document.getElementById("totalLitros");
-    
-    // Labels para atualizar texto de contagem
     const lblLitros = document.getElementById("lblLitros");
     const lblPed = document.getElementById("lblPed");
+    const valIndividual = document.getElementById("valIndividual");
+    const valCasal = document.getElementById("valCasal");
 
     const btnAdd = document.getElementById("btnAdd");
     const btnReset = document.getElementById("btnReset");
@@ -455,9 +479,7 @@
       const inp = document.createElement("input");
       inp.className = "input";
       inp.value = value ?? "";
-      if(type !== "time") {
-        inp.placeholder = placeholder ?? "";
-      }
+      if(type !== "time") inp.placeholder = placeholder ?? "";
       inp.inputMode = inputMode;
       inp.type = type;
       return inp;
@@ -547,13 +569,10 @@
         litrosSlot.appendChild(inLitros);
         tdLitros.appendChild(litrosSlot);
 
-        // Hora (NOVO)
+        // Hora
         const tdHora = document.createElement("td");
         tdHora.className = "col-hora";
-        const inHora = makeCellInput({
-          value: row.hora,
-          type: "time"
-        });
+        const inHora = makeCellInput({ value: row.hora, type: "time" });
         inHora.addEventListener("input", () => {
           rows[idx].hora = inHora.value;
           saveRows(rows);
@@ -594,8 +613,8 @@
       let totalP = 0;
       let totalL = 0;
       
-      let countC = 0; // Contador Combustível
-      let countP = 0; // Contador Pedágio
+      let countC = 0;
+      let countP = 0;
 
       for(const r of rows){
         const v = parseMoneyBR(r.valor);
@@ -612,18 +631,23 @@
       }
 
       const geral = totalC + totalP;
+      
+      // Calculos extras
+      const porPessoa = geral / 7;
+      const porCasal = porPessoa * 2;
 
       totalComb.textContent = formatBRL(totalC);
       
-      // Atualiza label e valor dos Litros
       lblLitros.textContent = `Total litros (${countC} abast.)`;
       totalLitros.textContent = formatLitros(totalL);
 
-      // Atualiza label e valor dos Pedágios
       lblPed.textContent = `Total pedágio (${countP} paradas)`;
       totalPed.textContent = formatBRL(totalP);
 
       totalGeral.textContent = formatBRL(geral);
+      
+      valIndividual.textContent = formatBRL(porPessoa);
+      valCasal.textContent = formatBRL(porCasal);
     }
 
     btnAdd.addEventListener("click", () => {
