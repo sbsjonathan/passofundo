@@ -1,508 +1,317 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Controle de Pedágios</title>
-  <style>
-    :root{
-      --bg: #0b1220;
-      --card: rgba(255,255,255,.08);
-      --card2: rgba(255,255,255,.06);
-      --stroke: rgba(255,255,255,.14);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.62);
-      --accent: #7c5cff;
-      --accent2:#29d3ff;
-      --danger:#ff4d6d;
-      --ok:#19c37d;
-      --shadow: 0 14px 40px rgba(0,0,0,.35);
-      --radius: 18px;
-    }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color: var(--text);
-      background:
-        radial-gradient(1200px 700px at 10% -10%, rgba(124,92,255,.35), transparent 60%),
-        radial-gradient(1000px 700px at 110% 0%, rgba(41,211,255,.26), transparent 55%),
-        radial-gradient(900px 600px at 50% 120%, rgba(25,195,125,.18), transparent 55%),
-        var(--bg);
-      padding: 22px 16px 28px;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    .wrap{ max-width: 980px; margin: 0 auto; }
+<title>Controle</title>
 
-    header{
-      display:flex; align-items:flex-start; justify-content:space-between;
-      gap:14px; margin-bottom: 16px;
-    }
-    .title{
-      display:flex; flex-direction:column; gap:6px;
-    }
-    .title h1{
-      margin:0;
-      font-size: 22px;
-      letter-spacing: .2px;
-      display:flex; align-items:center; gap:10px;
-    }
-    .pill{
-      font-size:12px;
-      padding: 4px 10px;
-      border: 1px solid var(--stroke);
-      background: rgba(255,255,255,.06);
-      border-radius: 999px;
-      color: var(--muted);
-    }
-    .title p{ margin:0; color:var(--muted); font-size:13px; }
+<style>
+:root{
+  --bg:#0b1220;
+  --card:rgba(255,255,255,.06);
+  --text:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.65);
+  --line:rgba(255,255,255,.12);
+  --shadow:0 18px 55px rgba(0,0,0,.35);
+  --r:18px;
+  --pad:14px;
+  --accent:#7c4dff;
+  --good:#1dd1a1;
+  --danger:#ff5d5d;
+  --focus:rgba(124,77,255,.45);
+}
 
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.06));
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
+*{box-sizing:border-box;}
 
-    .toolbar{
-      display:flex; flex-wrap:wrap; gap:10px;
-      padding: 14px;
-      border-bottom: 1px solid var(--stroke);
-      background: rgba(0,0,0,.10);
-      align-items:center;
-    }
-    .toolbar .spacer{ flex:1; }
+body{
+  margin:0;
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#070b13,#0b1220,#070b13);
+  min-height:100vh;
+  padding:16px 14px 34px;
+}
 
-    .btn{
-      appearance:none; border:1px solid var(--stroke);
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 13px;
-      display:inline-flex; align-items:center; gap:8px;
-      cursor:pointer;
-      transition: transform .06s ease, background .15s ease, border-color .15s ease;
-      user-select:none;
-    }
-    .btn:active{ transform: translateY(1px); }
-    .btn.primary{
-      border-color: rgba(124,92,255,.55);
-      background: linear-gradient(180deg, rgba(124,92,255,.35), rgba(124,92,255,.18));
-    }
-    .btn.danger{
-      border-color: rgba(255,77,109,.55);
-      background: linear-gradient(180deg, rgba(255,77,109,.28), rgba(255,77,109,.14));
-    }
-    .btn.ghost{
-      background: transparent;
-    }
-    .btn small{
-      font-weight:700;
-      opacity:.8;
-    }
+.wrap{max-width:520px;margin:0 auto;}
 
-    .search{
-      display:flex; align-items:center; gap:10px;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.06);
-      border-radius: 12px;
-      padding: 10px 12px;
-      min-width: 220px;
-      flex: 1;
-      max-width: 420px;
-    }
-    .search input{
-      width:100%;
-      border:0;
-      outline:0;
-      background:transparent;
-      color: var(--text);
-      font-size: 14px;
-    }
-    .search input::placeholder{ color: rgba(255,255,255,.45); }
+h1{font-size:20px;margin:6px 2px 12px;}
 
-    table{
-      width:100%;
-      border-collapse: collapse;
-    }
-    thead th{
-      text-align:left;
-      font-size:12px;
-      letter-spacing:.6px;
-      text-transform:uppercase;
-      color: rgba(255,255,255,.66);
-      padding: 12px 14px;
-      background: rgba(255,255,255,.04);
-      border-bottom: 1px solid var(--stroke);
-    }
-    tbody td{
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      vertical-align: middle;
-    }
-    tbody tr{
-      background: rgba(255,255,255,.02);
-    }
-    tbody tr:hover{
-      background: rgba(255,255,255,.05);
-    }
+.card{
+  background:linear-gradient(180deg,var(--card),rgba(255,255,255,.04));
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
 
-    .col-num{ width: 74px; color: var(--muted); }
-    .col-valor{ width: 160px; }
-    .col-actions{ width: 132px; text-align:right; }
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  padding:12px var(--pad);
+  border-bottom:1px solid var(--line);
+}
 
-    .cell-input{
-      width:100%;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.12);
-      color: var(--text);
-      padding: 10px 10px;
-      border-radius: 12px;
-      outline: none;
-      font-size: 14px;
-    }
-    .cell-input:focus{
-      border-color: rgba(41,211,255,.55);
-      box-shadow: 0 0 0 3px rgba(41,211,255,.15);
-    }
-    .money{
-      display:flex; align-items:center; gap:10px;
-    }
-    .prefix{
-      color: rgba(255,255,255,.62);
-      font-weight: 700;
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.12);
-      white-space:nowrap;
-    }
+button{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:600;
+}
 
-    tfoot td{
-      padding: 14px;
-      border-top: 1px solid var(--stroke);
-      background: rgba(0,0,0,.10);
-      font-weight: 800;
-    }
-    .totalRow{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .totalRow .label{ color: rgba(255,255,255,.76); }
-    .totalRow .value{
-      font-size: 18px;
-      background: linear-gradient(90deg, rgba(124,92,255,.85), rgba(41,211,255,.85));
-      -webkit-background-clip: text;
-      background-clip:text;
-      color: transparent;
-    }
+button.primary{
+  border-color:rgba(124,77,255,.55);
+  background:rgba(124,77,255,.18);
+}
 
-    .hint{
-      padding: 12px 14px 0;
-      color: rgba(255,255,255,.55);
-      font-size: 12px;
-    }
+button.danger{
+  border-color:rgba(255,93,93,.55);
+  background:rgba(255,93,93,.14);
+}
 
-    .rowBtns{
-      display:inline-flex; gap:8px; justify-content:flex-end;
-    }
-    .icon{
-      width: 18px; height: 18px; display:inline-block;
-    }
+.scroller{
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
 
-    @media (max-width: 640px){
-      thead th:nth-child(1){ width:56px; }
-      .col-actions{ width: 110px; }
-      .search{ min-width: 0; max-width: none; }
-    }
-  </style>
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+}
+
+thead th{
+  font-size:12px;
+  color:var(--muted);
+  padding:12px var(--pad);
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+}
+
+tbody td{
+  padding:10px var(--pad);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.cell-id{
+  width:50px;
+  color:var(--muted);
+  font-weight:700;
+}
+
+.input{
+  width:100%;
+  padding:11px 12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  outline:none;
+  font-size:13px;
+  min-height:42px;
+}
+
+.input:focus{
+  border-color:rgba(124,77,255,.7);
+  box-shadow:0 0 0 4px var(--focus);
+}
+
+.col-local{min-width:190px;}
+.col-tipo{min-width:90px;}
+.col-valor{min-width:120px;}
+.col-litros{min-width:120px;}
+
+.seg{
+  display:inline-flex;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.seg button{
+  border:none;
+  background:transparent;
+  padding:10px 14px;
+  font-weight:800;
+}
+
+.seg button.on{
+  background:rgba(124,77,255,.22);
+  box-shadow:inset 0 0 0 1px rgba(124,77,255,.45);
+}
+
+.litrosSlot.hidden{
+  opacity:0;
+  pointer-events:none;
+}
+
+.cell-actions{
+  width:60px;
+  text-align:right;
+}
+
+.icon-btn{
+  min-width:42px;
+  min-height:42px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  font-weight:900;
+}
+
+.icon-btn.del{
+  border-color:rgba(255,93,93,.45);
+  background:rgba(255,93,93,.12);
+}
+
+.totals{
+  padding:12px var(--pad);
+  border-top:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+}
+
+.totalRow{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
-      <div class="title">
-        <h1>
-          Controle de Pedágios
-          <span class="pill" id="countPill">2 itens</span>
-        </h1>
-        <p>Edite direto na tabela. O total soma automaticamente.</p>
-      </div>
+<div class="wrap">
+<h1>Controle</h1>
 
-      <button class="btn primary" id="addBtn" type="button" title="Adicionar pedágio">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        Adicionar
-      </button>
-    </header>
+<div class="card">
 
-    <div class="card">
-      <div class="toolbar">
-        <div class="search" title="Filtrar por nome">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M21 21l-4.3-4.3m1.8-5.2a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <input id="searchInput" placeholder="Filtrar (ex.: Seropedica)" />
-        </div>
+<div class="toolbar">
+  <button class="primary" id="btnAdd">+ Adicionar</button>
+  <button class="danger" id="btnReset">Reset</button>
+</div>
 
-        <div class="spacer"></div>
+<div class="scroller">
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Local</th>
+<th>P/C</th>
+<th>Valor</th>
+<th>Litros</th>
+<th></th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
 
-        <button class="btn ghost" id="resetBtn" type="button" title="Voltar para os dados iniciais">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M3 12a9 9 0 0115.5-6.4M21 12a9 9 0 01-15.5 6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M18 3v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 21v-4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Reset
-        </button>
-
-        <button class="btn danger" id="clearBtn" type="button" title="Apagar tudo">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 7h16M10 11v7M14 11v7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M6 7l1-2h10l1 2M9 7V5m6 2V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Limpar
-        </button>
-      </div>
-
-      <div class="hint">Dica: no valor, pode digitar “16,4” ou “16.4”.</div>
-
-      <div style="overflow:auto; padding: 12px 10px 10px;">
-        <table aria-label="Tabela de pedágios">
-          <thead>
-            <tr>
-              <th class="col-num">#</th>
-              <th>Local</th>
-              <th class="col-valor">Valor</th>
-              <th class="col-actions" style="text-align:right;">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4">
-                <div class="totalRow">
-                  <span class="label">Total</span>
-                  <span class="value" id="totalValue">R$ 0,00</span>
-                </div>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
+<div class="totals">
+  <div class="totalRow"><span>Total combustível</span><span id="totalComb">R$ 0,00</span></div>
+  <div class="totalRow"><span>Total pedágio</span><span id="totalPed">R$ 0,00</span></div>
+  <div class="totalRow" style="border-top:1px solid rgba(255,255,255,.12);padding-top:8px;">
+    <span>Total geral</span><span id="totalGeral">R$ 0,00</span>
   </div>
+</div>
 
-  <script>
-    // ===== Dados iniciais (os da sua planilha por enquanto) =====
-    const DEFAULT_DATA = [
-      { local: "Seropedica", valor: 16.4 },
-      { local: "São paulo",  valor: 16.4 },
-    ];
+</div>
+</div>
 
-    const STORAGE_KEY = "pedagios_v1";
+<script>
+const DEFAULT_ROWS = [
+ {local:"Seropedica",tipo:"P",valor:"16,4",litros:""},
+ {local:"Itatiaia",tipo:"P",valor:"14,5",litros:""},
+ {local:"Guaratinguetá",tipo:"C",valor:"170,31",litros:"37,93"},
+ {local:"Pinguamonhang",tipo:"P",valor:"16,9",litros:""},
+ {local:"Jacarei",tipo:"P",valor:"8,1",litros:""},
+ {local:"Guararema",tipo:"P",valor:"4,5",litros:""},
+ {local:"Arujá",tipo:"P",valor:"4,5",litros:""}
+];
 
-    // ===== Estado =====
-    let rows = load() ?? structuredClone(DEFAULT_DATA);
-    let filterText = "";
+const STORAGE="controle_gastos_v3";
 
-    // ===== Helpers =====
-    function load(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return null;
-        const parsed = JSON.parse(raw);
-        if(!Array.isArray(parsed)) return null;
-        return parsed.map(r => ({
-          local: String(r.local ?? ""),
-          valor: Number(r.valor ?? 0)
-        }));
-      }catch(e){
-        return null;
-      }
-    }
-    function save(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
-    }
+let rows = JSON.parse(localStorage.getItem(STORAGE)) || DEFAULT_ROWS;
 
-    function parseMoney(input){
-      // aceita "16,4" ou "16.4" ou "R$ 16,40"
-      const s = String(input).trim()
-        .replace(/[^\d,.\-]/g, "")
-        .replace(",", ".");
-      const n = Number(s);
-      return Number.isFinite(n) ? n : 0;
-    }
+const tbody=document.getElementById("tbody");
+const totalComb=document.getElementById("totalComb");
+const totalPed=document.getElementById("totalPed");
+const totalGeral=document.getElementById("totalGeral");
 
-    function formatBRL(n){
-      return n.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
-    }
+function save(){localStorage.setItem(STORAGE,JSON.stringify(rows));}
 
-    function computeTotal(){
-      return rows.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
-    }
+function parseMoney(s){
+ if(!s)return 0;
+ s=s.replace(",",".");
+ return Number(s)||0;
+}
 
-    function setCountPill(){
-      const pill = document.getElementById("countPill");
-      const n = rows.length;
-      pill.textContent = n + (n === 1 ? " item" : " itens");
-    }
+function format(n){
+ return n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
 
-    // ===== Render =====
-    function render(){
-      const tbody = document.getElementById("tbody");
-      tbody.innerHTML = "";
+function render(){
+ tbody.innerHTML="";
+ rows.forEach((r,i)=>{
+  const tr=document.createElement("tr");
 
-      const visible = rows
-        .map((r, idx) => ({...r, _idx: idx}))
-        .filter(r => r.local.toLowerCase().includes(filterText));
+  tr.innerHTML=`
+  <td class="cell-id">${i+1}</td>
+  <td class="col-local"><input class="input" value="${r.local}"></td>
+  <td class="col-tipo">
+    <div class="seg">
+      <button class="${r.tipo==="P"?"on":""}">P</button>
+      <button class="${r.tipo==="C"?"on":""}">C</button>
+    </div>
+  </td>
+  <td class="col-valor"><input class="input" placeholder="14,40" value="${r.valor||""}"></td>
+  <td class="col-litros"><input class="input ${r.tipo==="C"?"":"hidden"}" placeholder="Litros" value="${r.litros||""}"></td>
+  <td class="cell-actions"><button class="icon-btn del">✕</button></td>
+  `;
 
-      visible.forEach((r, viewIndex) => {
-        const tr = document.createElement("tr");
+  const inputs=tr.querySelectorAll("input");
+  inputs[0].oninput=e=>{rows[i].local=e.target.value;save();}
+  inputs[1]?.oninput;
+  inputs[2].oninput=e=>{rows[i].valor=e.target.value;save();updateTotals();}
+  inputs[3]?.oninput=e=>{rows[i].litros=e.target.value;save();}
 
-        // #
-        const tdNum = document.createElement("td");
-        tdNum.className = "col-num";
-        tdNum.textContent = String(viewIndex + 1);
-        tr.appendChild(tdNum);
+  const [bP,bC]=tr.querySelectorAll(".seg button");
+  bP.onclick=()=>{rows[i].tipo="P";rows[i].litros="";save();render();}
+  bC.onclick=()=>{rows[i].tipo="C";save();render();}
 
-        // Local
-        const tdLocal = document.createElement("td");
-        const inLocal = document.createElement("input");
-        inLocal.className = "cell-input";
-        inLocal.value = r.local;
-        inLocal.placeholder = "Ex.: Seropedica";
-        inLocal.addEventListener("input", () => {
-          rows[r._idx].local = inLocal.value;
-          save();
-        });
-        tdLocal.appendChild(inLocal);
-        tr.appendChild(tdLocal);
+  tr.querySelector(".del").onclick=()=>{rows.splice(i,1);save();render();}
 
-        // Valor
-        const tdValor = document.createElement("td");
-        tdValor.className = "col-valor";
-        const moneyWrap = document.createElement("div");
-        moneyWrap.className = "money";
+  tbody.appendChild(tr);
+ });
+ updateTotals();
+}
 
-        const prefix = document.createElement("span");
-        prefix.className = "prefix";
-        prefix.textContent = "R$";
+function updateTotals(){
+ let c=0,p=0;
+ rows.forEach(r=>{
+  const v=parseMoney(r.valor);
+  if(r.tipo==="C")c+=v; else p+=v;
+ });
+ totalComb.textContent=format(c);
+ totalPed.textContent=format(p);
+ totalGeral.textContent=format(c+p);
+}
 
-        const inValor = document.createElement("input");
-        inValor.className = "cell-input";
-        inValor.inputMode = "decimal";
-        inValor.value = String(String(r.valor).replace(".", ","));
-        inValor.placeholder = "0,00";
-        inValor.addEventListener("input", () => {
-          rows[r._idx].valor = parseMoney(inValor.value);
-          save();
-          updateTotal();
-        });
+document.getElementById("btnAdd").onclick=()=>{
+ rows.push({local:"",tipo:"P",valor:"",litros:""});
+ save();render();
+}
 
-        moneyWrap.appendChild(prefix);
-        moneyWrap.appendChild(inValor);
-        tdValor.appendChild(moneyWrap);
-        tr.appendChild(tdValor);
+document.getElementById("btnReset").onclick=()=>{
+ rows=[...DEFAULT_ROWS];
+ save();render();
+}
 
-        // Ações
-        const tdAct = document.createElement("td");
-        tdAct.className = "col-actions";
-
-        const btns = document.createElement("div");
-        btns.className = "rowBtns";
-
-        const upBtn = document.createElement("button");
-        upBtn.type = "button";
-        upBtn.className = "btn";
-        upBtn.title = "Subir";
-        upBtn.innerHTML = `
-          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 5l6 6H6l6-6z" fill="currentColor"/>
-            <path d="M6 19h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <small>↑</small>
-        `;
-        upBtn.addEventListener("click", () => {
-          if (r._idx <= 0) return;
-          const tmp = rows[r._idx - 1];
-          rows[r._idx - 1] = rows[r._idx];
-          rows[r._idx] = tmp;
-          save();
-          render();
-        });
-
-        const delBtn = document.createElement("button");
-        delBtn.type = "button";
-        delBtn.className = "btn danger";
-        delBtn.title = "Excluir";
-        delBtn.innerHTML = `
-          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M10 11v7M14 11v7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M6 7l1-2h10l1 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        `;
-        delBtn.addEventListener("click", () => {
-          rows.splice(r._idx, 1);
-          save();
-          render();
-          updateTotal();
-          setCountPill();
-        });
-
-        btns.appendChild(upBtn);
-        btns.appendChild(delBtn);
-        tdAct.appendChild(btns);
-        tr.appendChild(tdAct);
-
-        tbody.appendChild(tr);
-      });
-
-      setCountPill();
-      updateTotal();
-    }
-
-    function updateTotal(){
-      document.getElementById("totalValue").textContent = formatBRL(computeTotal());
-    }
-
-    // ===== Eventos =====
-    document.getElementById("addBtn").addEventListener("click", () => {
-      rows.push({ local: "", valor: 0 });
-      save();
-      render();
-      // foca no último "Local"
-      setTimeout(() => {
-        const tbody = document.getElementById("tbody");
-        const lastRow = tbody.querySelector("tr:last-child input");
-        if(lastRow) lastRow.focus();
-      }, 50);
-    });
-
-    document.getElementById("clearBtn").addEventListener("click", () => {
-      rows = [];
-      save();
-      render();
-    });
-
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      rows = structuredClone(DEFAULT_DATA);
-      save();
-      render();
-    });
-
-    document.getElementById("searchInput").addEventListener("input", (e) => {
-      filterText = e.target.value.toLowerCase().trim();
-      render();
-    });
-
-    // ===== Boot =====
-    render();
-  </script>
+render();
+</script>
 </body>
 </html>
