@@ -135,7 +135,8 @@
     table{
       width:100%;
       border-collapse:collapse;
-      min-width: 500px; 
+      /* Aumentei min-width para caber a coluna Hora sem espremer */
+      min-width: 600px; 
     }
 
     thead th{
@@ -162,7 +163,7 @@
     tbody tr:hover td{ background:rgba(255,255,255,.02); }
 
     .cell-id{
-      width:40px;
+      width:35px;
       color:var(--muted);
       font-weight:800;
       font-size: 12px;
@@ -180,16 +181,24 @@
       outline:none;
       font-size:13px;
       min-height:36px;
+      font-family: inherit;
     }
     .input:focus{
       border-color:rgba(124,77,255,.7);
       box-shadow:0 0 0 4px var(--focus);
     }
+    
+    /* Estilo especifico para input de hora */
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      opacity: 0.6;
+    }
 
-    .col-local{ min-width: 170px; } 
+    .col-local{ min-width: 150px; } 
     .col-tipo{ min-width: 80px; }
-    .col-valor{ min-width: 100px; }
-    .col-litros{ min-width: 100px; }
+    .col-valor{ min-width: 90px; }
+    .col-litros{ min-width: 90px; }
+    .col-hora{ min-width: 95px; } /* Nova coluna */
 
     .typeWrap{
       display:flex;
@@ -211,7 +220,7 @@
       padding:6px 10px;
       font-weight:800;
       font-size:12px;
-      min-width:44px;
+      min-width:38px;
       border-radius:0;
     }
     .seg button.on{
@@ -229,7 +238,7 @@
     }
 
     .cell-actions{
-      width:50px;
+      width:40px;
       text-align:right;
       white-space:nowrap;
     }
@@ -268,12 +277,13 @@
       font-size:13px;
       font-weight:800;
     }
-    .totalRow span:first-child{ color:var(--muted); font-weight:700; }
+    /* Alvo para os labels */
+    .totalLabel{ color:var(--muted); font-weight:700; }
     .totalRow .num{ font-variant-numeric: tabular-nums; }
 
     @media (max-width: 520px){
       .wrap{ max-width: 520px; }
-      table{ min-width: 500px; }
+      table{ min-width: 600px; }
     }
   </style>
 </head>
@@ -305,6 +315,7 @@
               <th>P/C</th>
               <th>Valor</th>
               <th>Litros</th>
+              <th>Hora</th>
               <th></th>
             </tr>
           </thead>
@@ -314,19 +325,20 @@
 
       <div class="totals">
         <div class="totalRow">
-          <span>Total combustível</span>
+          <span class="totalLabel">Total combustível</span>
           <span class="num" id="totalComb">R$ 0,00</span>
         </div>
         <div class="totalRow">
-          <span>Total litros</span>
+          <!-- Labels com IDs para atualizar o texto (X abastecimentos) -->
+          <span class="totalLabel" id="lblLitros">Total litros</span>
           <span class="num" id="totalLitros">0,00 L</span>
         </div>
         <div class="totalRow">
-          <span>Total pedágio</span>
+          <span class="totalLabel" id="lblPed">Total pedágio</span>
           <span class="num" id="totalPed">R$ 0,00</span>
         </div>
         <div class="totalRow" style="padding-top:6px;border-top:1px solid rgba(255,255,255,.10);">
-          <span>Total geral</span>
+          <span class="totalLabel">Total geral</span>
           <span class="num" id="totalGeral">R$ 0,00</span>
         </div>
       </div>
@@ -334,29 +346,40 @@
   </div>
 
   <script>
-    // Atualizado com o item 12: Miracatu
+    // Atualizado com itens 13-16 e campo Hora vazio por padrão
     const DEFAULT_ROWS = [
-      { local: "Seropedica",          tipo: "P", valor: "16,40", litros: "" },
-      { local: "Itatiaia",            tipo: "P", valor: "14,50", litros: "" },
-      { local: "Guaratinguetá",       tipo: "C", valor: "170,31", litros: "37,93" },
-      { local: "Pindamonhangaba",     tipo: "P", valor: "16,90", litros: "" },
-      { local: "Jacarei",             tipo: "P", valor: "8,10",  litros: "" },
-      { local: "Guararema",           tipo: "P", valor: "4,50",  litros: "" },
-      { local: "Arujá",               tipo: "P", valor: "4,50",  litros: "" },
-      { local: "São Paulo",           tipo: "P", valor: "4,60",  litros: "" },
-      { local: "Osasco",              tipo: "P", valor: "3,50",  litros: "" },
-      { local: "São Lourenço Serra",  tipo: "P", valor: "4,30",  litros: "" },
-      { local: "Juquitiba",           tipo: "C", valor: "150,06", litros: "33,42" },
-      { local: "Miracatu",            tipo: "P", valor: "4,30",   litros: "" }
+      { local: "Seropedica",          tipo: "P", valor: "16,40", litros: "", hora: "" },
+      { local: "Itatiaia",            tipo: "P", valor: "14,50", litros: "", hora: "" },
+      { local: "Guaratinguetá",       tipo: "C", valor: "170,31", litros: "37,93", hora: "" },
+      { local: "Pindamonhangaba",     tipo: "P", valor: "16,90", litros: "", hora: "" },
+      { local: "Jacarei",             tipo: "P", valor: "8,10",  litros: "", hora: "" },
+      { local: "Guararema",           tipo: "P", valor: "4,50",  litros: "", hora: "" },
+      { local: "Arujá",               tipo: "P", valor: "4,50",  litros: "", hora: "" },
+      { local: "São Paulo",           tipo: "P", valor: "4,60",  litros: "", hora: "" },
+      { local: "Osasco",              tipo: "P", valor: "3,50",  litros: "", hora: "" },
+      { local: "São Lourenço Serra",  tipo: "P", valor: "4,30",  litros: "", hora: "" },
+      { local: "Juquitiba",           tipo: "C", valor: "150,06", litros: "33,42", hora: "" },
+      { local: "Miracatu",            tipo: "P", valor: "4,30",   litros: "", hora: "" },
+      { local: "Juquia",              tipo: "P", valor: "4,30",   litros: "", hora: "" },
+      { local: "Cajati",              tipo: "P", valor: "4,30",   litros: "", hora: "" },
+      { local: "Barra do Turvo - SP", tipo: "P", valor: "4,30",   litros: "", hora: "" },
+      { local: "Antonina - PR",       tipo: "C", valor: "182,40", litros: "36,12", hora: "" }
     ];
 
-    const STORAGE_KEY = "controle_gastos_v5"; // v5 para atualizar
+    const STORAGE_KEY = "controle_gastos_v6"; // v6
 
     const tbody = document.getElementById("tbody");
+    
+    // Elementos de Valor
     const totalComb = document.getElementById("totalComb");
     const totalPed = document.getElementById("totalPed");
     const totalGeral = document.getElementById("totalGeral");
     const totalLitros = document.getElementById("totalLitros");
+    
+    // Labels para atualizar texto de contagem
+    const lblLitros = document.getElementById("lblLitros");
+    const lblPed = document.getElementById("lblPed");
+
     const btnAdd = document.getElementById("btnAdd");
     const btnReset = document.getElementById("btnReset");
 
@@ -374,7 +397,8 @@
           local: (r?.local ?? "").toString(),
           tipo: ((r?.tipo ?? "P").toString().toUpperCase() === "C") ? "C" : "P",
           valor: (r?.valor ?? "").toString(),
-          litros: (r?.litros ?? "").toString()
+          litros: (r?.litros ?? "").toString(),
+          hora: (r?.hora ?? "").toString()
         }));
       }catch{
         return deepCopy(DEFAULT_ROWS);
@@ -399,11 +423,9 @@
       if(typeof s !== "string") return 0;
       const t = s.trim();
       if(!t) return 0;
-
       const lastComma = t.lastIndexOf(",");
       const lastDot = t.lastIndexOf(".");
       let normalized = t;
-
       if(lastComma > -1 && lastDot > -1){
         const decIsComma = lastComma > lastDot;
         normalized = decIsComma
@@ -412,7 +434,6 @@
       }else{
         normalized = t.replace(",", ".");
       }
-
       const n = Number(normalized);
       return Number.isFinite(n) ? n : 0;
     }
@@ -430,12 +451,15 @@
       return !s || s.trim()==="" || n === 0;
     }
 
-    function makeCellInput({ value, placeholder, inputMode="text" }){
+    function makeCellInput({ value, placeholder, inputMode="text", type="text" }){
       const inp = document.createElement("input");
       inp.className = "input";
       inp.value = value ?? "";
-      inp.placeholder = placeholder ?? "";
+      if(type !== "time") {
+        inp.placeholder = placeholder ?? "";
+      }
       inp.inputMode = inputMode;
+      inp.type = type;
       return inp;
     }
 
@@ -459,6 +483,7 @@
         tdId.className = "cell-id";
         tdId.textContent = String(idx + 1);
 
+        // Local
         const tdLocal = document.createElement("td");
         tdLocal.className = "col-local";
         const inLocal = makeCellInput({ value: row.local, placeholder: "Local" });
@@ -468,27 +493,26 @@
         });
         tdLocal.appendChild(inLocal);
 
+        // Tipo
         const tdTipo = document.createElement("td");
         tdTipo.className = "col-tipo";
         const seg = document.createElement("div");
         seg.className = "seg";
-
         const bP = document.createElement("button");
         bP.type = "button";
         bP.textContent = "P";
         bP.className = (row.tipo === "P") ? "on" : "";
         bP.addEventListener("click", () => setTipo(idx, "P"));
-
         const bC = document.createElement("button");
         bC.type = "button";
         bC.textContent = "C";
         bC.className = (row.tipo === "C") ? "on" : "";
         bC.addEventListener("click", () => setTipo(idx, "C"));
-
         seg.appendChild(bP);
         seg.appendChild(bC);
         tdTipo.appendChild(seg);
 
+        // Valor
         const tdValor = document.createElement("td");
         tdValor.className = "col-valor";
         const inValor = makeCellInput({
@@ -496,38 +520,47 @@
           placeholder: "0,00",
           inputMode: "decimal"
         });
-
         if(isZeroLikeMoney(row.valor) && row.valor === "") inValor.value = "";
-
         inValor.addEventListener("input", () => {
           const norm = normalizeMoneyInput(inValor.value);
           rows[idx].valor = norm;
           saveRows(rows);
           updateTotals();
         });
-
         tdValor.appendChild(inValor);
 
+        // Litros
         const tdLitros = document.createElement("td");
         tdLitros.className = "col-litros";
         const litrosSlot = document.createElement("div");
         litrosSlot.className = "litrosSlot" + (row.tipo === "C" ? "" : " hidden");
-
         const inLitros = makeCellInput({
           value: row.litros,
           placeholder: "Lts",
           inputMode: "decimal"
         });
-
         inLitros.addEventListener("input", () => {
           rows[idx].litros = normalizeMoneyInput(inLitros.value);
           saveRows(rows);
           updateTotals();
         });
-
         litrosSlot.appendChild(inLitros);
         tdLitros.appendChild(litrosSlot);
 
+        // Hora (NOVO)
+        const tdHora = document.createElement("td");
+        tdHora.className = "col-hora";
+        const inHora = makeCellInput({
+          value: row.hora,
+          type: "time"
+        });
+        inHora.addEventListener("input", () => {
+          rows[idx].hora = inHora.value;
+          saveRows(rows);
+        });
+        tdHora.appendChild(inHora);
+
+        // Ações
         const tdActions = document.createElement("td");
         tdActions.className = "cell-actions";
         const btnDel = document.createElement("button");
@@ -547,6 +580,7 @@
         tr.appendChild(tdTipo);
         tr.appendChild(tdValor);
         tr.appendChild(tdLitros);
+        tr.appendChild(tdHora);
         tr.appendChild(tdActions);
 
         tbody.appendChild(tr);
@@ -559,6 +593,9 @@
       let totalC = 0;
       let totalP = 0;
       let totalL = 0;
+      
+      let countC = 0; // Contador Combustível
+      let countP = 0; // Contador Pedágio
 
       for(const r of rows){
         const v = parseMoneyBR(r.valor);
@@ -567,21 +604,30 @@
         if(r.tipo === "C") {
           totalC += v;
           totalL += l;
+          countC++;
         } else {
           totalP += v;
+          countP++;
         }
       }
 
       const geral = totalC + totalP;
 
       totalComb.textContent = formatBRL(totalC);
-      totalPed.textContent = formatBRL(totalP);
-      totalGeral.textContent = formatBRL(geral);
+      
+      // Atualiza label e valor dos Litros
+      lblLitros.textContent = `Total litros (${countC} abast.)`;
       totalLitros.textContent = formatLitros(totalL);
+
+      // Atualiza label e valor dos Pedágios
+      lblPed.textContent = `Total pedágio (${countP} paradas)`;
+      totalPed.textContent = formatBRL(totalP);
+
+      totalGeral.textContent = formatBRL(geral);
     }
 
     btnAdd.addEventListener("click", () => {
-      rows.push({ local:"", tipo:"P", valor:"", litros:"" });
+      rows.push({ local:"", tipo:"P", valor:"", litros:"", hora:"" });
       saveRows(rows);
       render();
       setTimeout(() => {
