@@ -135,13 +135,12 @@
     table{
       width:100%;
       border-collapse:collapse;
-      /* Reduzi um pouco o min-width geral pois a coluna local diminuiu */
       min-width: 500px; 
     }
 
     thead th{
       text-align:left;
-      font-size:11px; /* Levemente menor */
+      font-size:11px;
       color:var(--muted);
       font-weight:700;
       letter-spacing:.35px;
@@ -155,7 +154,7 @@
     }
 
     tbody td{
-      padding:8px var(--pad); /* Rows mais compactas */
+      padding:8px var(--pad);
       border-bottom:1px solid rgba(255,255,255,.06);
       vertical-align:middle;
       background:transparent;
@@ -171,7 +170,6 @@
       white-space:nowrap;
     }
 
-    /* Input Style Alterado: Fonte menor e altura menor */
     .input{
       width:100%;
       padding:8px 10px;
@@ -180,7 +178,7 @@
       background:rgba(255,255,255,.06);
       color:var(--text);
       outline:none;
-      font-size:13px; /* -2px conforme pedido */
+      font-size:13px;
       min-height:36px;
     }
     .input:focus{
@@ -188,7 +186,6 @@
       box-shadow:0 0 0 4px var(--focus);
     }
 
-    /* Coluna Local reduzida */
     .col-local{ min-width: 170px; } 
     .col-tipo{ min-width: 80px; }
     .col-valor{ min-width: 100px; }
@@ -337,24 +334,29 @@
   </div>
 
   <script>
-    // Atualizado com os dados da imagem
+    // Atualizado com o item 12: Miracatu
     const DEFAULT_ROWS = [
-      { local: "Seropedica",      tipo: "P", valor: "16,40", litros: "" },
-      { local: "Itatiaia",        tipo: "P", valor: "14,50", litros: "" },
-      { local: "Guaratinguetá",   tipo: "C", valor: "170,31", litros: "37,93" },
-      { local: "Pindamonhangaba", tipo: "P", valor: "16,90", litros: "" },
-      { local: "Jacarei",         tipo: "P", valor: "8,10",  litros: "" },
-      { local: "Guararema",       tipo: "P", valor: "4,50",  litros: "" },
-      { local: "Arujá",           tipo: "P", valor: "4,50",  litros: "" }
+      { local: "Seropedica",          tipo: "P", valor: "16,40", litros: "" },
+      { local: "Itatiaia",            tipo: "P", valor: "14,50", litros: "" },
+      { local: "Guaratinguetá",       tipo: "C", valor: "170,31", litros: "37,93" },
+      { local: "Pindamonhangaba",     tipo: "P", valor: "16,90", litros: "" },
+      { local: "Jacarei",             tipo: "P", valor: "8,10",  litros: "" },
+      { local: "Guararema",           tipo: "P", valor: "4,50",  litros: "" },
+      { local: "Arujá",               tipo: "P", valor: "4,50",  litros: "" },
+      { local: "São Paulo",           tipo: "P", valor: "4,60",  litros: "" },
+      { local: "Osasco",              tipo: "P", valor: "3,50",  litros: "" },
+      { local: "São Lourenço Serra",  tipo: "P", valor: "4,30",  litros: "" },
+      { local: "Juquitiba",           tipo: "C", valor: "150,06", litros: "33,42" },
+      { local: "Miracatu",            tipo: "P", valor: "4,30",   litros: "" }
     ];
 
-    const STORAGE_KEY = "controle_gastos_v3"; // Mudei a chave para não conflitar com a anterior
+    const STORAGE_KEY = "controle_gastos_v5"; // v5 para atualizar
 
     const tbody = document.getElementById("tbody");
     const totalComb = document.getElementById("totalComb");
     const totalPed = document.getElementById("totalPed");
     const totalGeral = document.getElementById("totalGeral");
-    const totalLitros = document.getElementById("totalLitros"); // Elemento novo
+    const totalLitros = document.getElementById("totalLitros");
     const btnAdd = document.getElementById("btnAdd");
     const btnReset = document.getElementById("btnReset");
 
@@ -495,7 +497,6 @@
           inputMode: "decimal"
         });
 
-        // Se for zero, limpa visualmente se desejar, mas vou manter o value
         if(isZeroLikeMoney(row.valor) && row.valor === "") inValor.value = "";
 
         inValor.addEventListener("input", () => {
@@ -521,7 +522,7 @@
         inLitros.addEventListener("input", () => {
           rows[idx].litros = normalizeMoneyInput(inLitros.value);
           saveRows(rows);
-          updateTotals(); // Atualiza total de litros ao digitar
+          updateTotals();
         });
 
         litrosSlot.appendChild(inLitros);
@@ -590,8 +591,7 @@
     });
 
     btnReset.addEventListener("click", () => {
-      // Confirmação simples para evitar perda acidental
-      if(confirm("Deseja resetar para os valores padrão da imagem?")){
+      if(confirm("Deseja resetar para os valores padrão?")){
         rows = deepCopy(DEFAULT_ROWS);
         saveRows(rows);
         render();
