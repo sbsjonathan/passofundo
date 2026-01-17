@@ -1,317 +1,605 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Controle - Pedágios & Combustível</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.08);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.65);
+      --line:rgba(255,255,255,.12);
+      --shadow:0 18px 55px rgba(0,0,0,.35);
+      --r:18px;
+      --pad:14px;
+      --accent:#7c4dff;
+      --good:#1dd1a1;
+      --danger:#ff5d5d;
+      --focus:rgba(124,77,255,.45);
+    }
 
-<title>Controle</title>
+    *{ box-sizing:border-box; }
 
-<style>
-:root{
-  --bg:#0b1220;
-  --card:rgba(255,255,255,.06);
-  --text:rgba(255,255,255,.92);
-  --muted:rgba(255,255,255,.65);
-  --line:rgba(255,255,255,.12);
-  --shadow:0 18px 55px rgba(0,0,0,.35);
-  --r:18px;
-  --pad:14px;
-  --accent:#7c4dff;
-  --good:#1dd1a1;
-  --danger:#ff5d5d;
-  --focus:rgba(124,77,255,.45);
-}
+    body{
+      margin:0;
+      color:var(--text);
+      font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1100px 600px at 15% 10%, rgba(124,77,255,.35), transparent 55%),
+        radial-gradient(900px 520px at 85% 20%, rgba(29,209,161,.22), transparent 60%),
+        radial-gradient(900px 520px at 50% 110%, rgba(255,93,93,.14), transparent 55%),
+        linear-gradient(180deg, #070b13 0%, #0b1220 50%, #070b13 100%);
+      min-height:100vh;
+      padding:16px 14px 34px;
+    }
 
-*{box-sizing:border-box;}
+    .wrap{ max-width:520px; margin:0 auto; }
 
-body{
-  margin:0;
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
-  background:linear-gradient(180deg,#070b13,#0b1220,#070b13);
-  min-height:100vh;
-  padding:16px 14px 34px;
-}
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin:6px 2px 12px;
+    }
 
-.wrap{max-width:520px;margin:0 auto;}
+    h1{
+      font-size:20px;
+      margin:0;
+      letter-spacing:.2px;
+    }
 
-h1{font-size:20px;margin:6px 2px 12px;}
+    .card{
+      background:linear-gradient(180deg, var(--card) 0%, rgba(255,255,255,.045) 100%);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-.card{
-  background:linear-gradient(180deg,var(--card),rgba(255,255,255,.04));
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
+    .toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px var(--pad);
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
 
-.toolbar{
-  display:flex;
-  justify-content:space-between;
-  padding:12px var(--pad);
-  border-bottom:1px solid var(--line);
-}
+    .chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
 
-button{
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.06);
-  color:var(--text);
-  padding:10px 12px;
-  border-radius:12px;
-  font-size:13px;
-  font-weight:600;
-}
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-size:12px;
+      user-select:none;
+    }
 
-button.primary{
-  border-color:rgba(124,77,255,.55);
-  background:rgba(124,77,255,.18);
-}
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background:var(--accent);
+      box-shadow:0 0 0 4px rgba(124,77,255,.18);
+    }
+    .dot.good{ background:var(--good); box-shadow:0 0 0 4px rgba(29,209,161,.16); }
 
-button.danger{
-  border-color:rgba(255,93,93,.55);
-  background:rgba(255,93,93,.14);
-}
+    .actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
 
-.scroller{
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-}
+    button{
+      appearance:none;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.2px;
+      cursor:pointer;
+      transition:transform .06s ease, background .2s ease, border-color .2s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    button:active{ transform:scale(.98); }
+    button.primary{
+      border-color:rgba(124,77,255,.55);
+      background:rgba(124,77,255,.18);
+    }
+    button.danger{
+      border-color:rgba(255,93,93,.55);
+      background:rgba(255,93,93,.14);
+    }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:600px;
-}
+    .scroller{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+    }
 
-thead th{
-  font-size:12px;
-  color:var(--muted);
-  padding:12px var(--pad);
-  border-bottom:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      /* Reduzi um pouco o min-width geral pois a coluna local diminuiu */
+      min-width: 500px; 
+    }
 
-tbody td{
-  padding:10px var(--pad);
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
+    thead th{
+      text-align:left;
+      font-size:11px; /* Levemente menor */
+      color:var(--muted);
+      font-weight:700;
+      letter-spacing:.35px;
+      padding:10px var(--pad);
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      white-space:nowrap;
+      position:sticky;
+      top:0;
+      z-index:2;
+    }
 
-.cell-id{
-  width:50px;
-  color:var(--muted);
-  font-weight:700;
-}
+    tbody td{
+      padding:8px var(--pad); /* Rows mais compactas */
+      border-bottom:1px solid rgba(255,255,255,.06);
+      vertical-align:middle;
+      background:transparent;
+    }
+    tbody tr:hover td{ background:rgba(255,255,255,.02); }
 
-.input{
-  width:100%;
-  padding:11px 12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.06);
-  color:var(--text);
-  outline:none;
-  font-size:13px;
-  min-height:42px;
-}
+    .cell-id{
+      width:40px;
+      color:var(--muted);
+      font-weight:800;
+      font-size: 12px;
+      font-variant-numeric:tabular-nums;
+      white-space:nowrap;
+    }
 
-.input:focus{
-  border-color:rgba(124,77,255,.7);
-  box-shadow:0 0 0 4px var(--focus);
-}
+    /* Input Style Alterado: Fonte menor e altura menor */
+    .input{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
+      font-size:13px; /* -2px conforme pedido */
+      min-height:36px;
+    }
+    .input:focus{
+      border-color:rgba(124,77,255,.7);
+      box-shadow:0 0 0 4px var(--focus);
+    }
 
-.col-local{min-width:190px;}
-.col-tipo{min-width:90px;}
-.col-valor{min-width:120px;}
-.col-litros{min-width:120px;}
+    /* Coluna Local reduzida */
+    .col-local{ min-width: 170px; } 
+    .col-tipo{ min-width: 80px; }
+    .col-valor{ min-width: 100px; }
+    .col-litros{ min-width: 100px; }
 
-.seg{
-  display:inline-flex;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.05);
-  border-radius:14px;
-  overflow:hidden;
-}
+    .typeWrap{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
 
-.seg button{
-  border:none;
-  background:transparent;
-  padding:10px 14px;
-  font-weight:800;
-}
+    .seg{
+      display:inline-flex;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      border-radius:10px;
+      overflow:hidden;
+      min-height:36px;
+    }
+    .seg button{
+      border:none;
+      background:transparent;
+      padding:6px 10px;
+      font-weight:800;
+      font-size:12px;
+      min-width:44px;
+      border-radius:0;
+    }
+    .seg button.on{
+      background:rgba(124,77,255,.22);
+      box-shadow: inset 0 0 0 1px rgba(124,77,255,.45);
+    }
 
-.seg button.on{
-  background:rgba(124,77,255,.22);
-  box-shadow:inset 0 0 0 1px rgba(124,77,255,.45);
-}
+    .litrosSlot{
+      transition: opacity .15s ease, transform .15s ease;
+    }
+    .litrosSlot.hidden{
+      opacity:0;
+      transform: translateY(-3px);
+      pointer-events:none;
+    }
 
-.litrosSlot.hidden{
-  opacity:0;
-  pointer-events:none;
-}
+    .cell-actions{
+      width:50px;
+      text-align:right;
+      white-space:nowrap;
+    }
+    .icon-btn{
+      padding:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:900;
+      width:36px;
+      height:36px;
+      font-size:12px;
+    }
+    .icon-btn.del{
+      border-color:rgba(255,93,93,.45);
+      background:rgba(255,93,93,.12);
+    }
 
-.cell-actions{
-  width:60px;
-  text-align:right;
-}
+    .totals{
+      padding: 12px var(--pad);
+      border-top:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .totalRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-size:13px;
+      font-weight:800;
+    }
+    .totalRow span:first-child{ color:var(--muted); font-weight:700; }
+    .totalRow .num{ font-variant-numeric: tabular-nums; }
 
-.icon-btn{
-  min-width:42px;
-  min-height:42px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.06);
-  font-weight:900;
-}
-
-.icon-btn.del{
-  border-color:rgba(255,93,93,.45);
-  background:rgba(255,93,93,.12);
-}
-
-.totals{
-  padding:12px var(--pad);
-  border-top:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-}
-
-.totalRow{
-  display:flex;
-  justify-content:space-between;
-  font-size:14px;
-  font-weight:800;
-  margin-bottom:8px;
-}
-</style>
+    @media (max-width: 520px){
+      .wrap{ max-width: 520px; }
+      table{ min-width: 500px; }
+    }
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-<h1>Controle</h1>
+  <div class="wrap">
+    <header>
+      <h1>Controle</h1>
+    </header>
 
-<div class="card">
+    <div class="card">
+      <div class="toolbar">
+        <div class="chips">
+          <span class="chip"><span class="dot"></span>Itens</span>
+          <span class="chip"><span class="dot good"></span>Totais</span>
+        </div>
+        <div class="actions">
+          <button class="primary" id="btnAdd">+ Adicionar</button>
+          <button class="danger" id="btnReset">Reset</button>
+        </div>
+      </div>
 
-<div class="toolbar">
-  <button class="primary" id="btnAdd">+ Adicionar</button>
-  <button class="danger" id="btnReset">Reset</button>
-</div>
+      <div class="scroller">
+        <table aria-label="Tabela de gastos">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Local</th>
+              <th>P/C</th>
+              <th>Valor</th>
+              <th>Litros</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
 
-<div class="scroller">
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>Local</th>
-<th>P/C</th>
-<th>Valor</th>
-<th>Litros</th>
-<th></th>
-</tr>
-</thead>
-<tbody id="tbody"></tbody>
-</table>
-</div>
-
-<div class="totals">
-  <div class="totalRow"><span>Total combustível</span><span id="totalComb">R$ 0,00</span></div>
-  <div class="totalRow"><span>Total pedágio</span><span id="totalPed">R$ 0,00</span></div>
-  <div class="totalRow" style="border-top:1px solid rgba(255,255,255,.12);padding-top:8px;">
-    <span>Total geral</span><span id="totalGeral">R$ 0,00</span>
-  </div>
-</div>
-
-</div>
-</div>
-
-<script>
-const DEFAULT_ROWS = [
- {local:"Seropedica",tipo:"P",valor:"16,4",litros:""},
- {local:"Itatiaia",tipo:"P",valor:"14,5",litros:""},
- {local:"Guaratinguetá",tipo:"C",valor:"170,31",litros:"37,93"},
- {local:"Pinguamonhang",tipo:"P",valor:"16,9",litros:""},
- {local:"Jacarei",tipo:"P",valor:"8,1",litros:""},
- {local:"Guararema",tipo:"P",valor:"4,5",litros:""},
- {local:"Arujá",tipo:"P",valor:"4,5",litros:""}
-];
-
-const STORAGE="controle_gastos_v3";
-
-let rows = JSON.parse(localStorage.getItem(STORAGE)) || DEFAULT_ROWS;
-
-const tbody=document.getElementById("tbody");
-const totalComb=document.getElementById("totalComb");
-const totalPed=document.getElementById("totalPed");
-const totalGeral=document.getElementById("totalGeral");
-
-function save(){localStorage.setItem(STORAGE,JSON.stringify(rows));}
-
-function parseMoney(s){
- if(!s)return 0;
- s=s.replace(",",".");
- return Number(s)||0;
-}
-
-function format(n){
- return n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-}
-
-function render(){
- tbody.innerHTML="";
- rows.forEach((r,i)=>{
-  const tr=document.createElement("tr");
-
-  tr.innerHTML=`
-  <td class="cell-id">${i+1}</td>
-  <td class="col-local"><input class="input" value="${r.local}"></td>
-  <td class="col-tipo">
-    <div class="seg">
-      <button class="${r.tipo==="P"?"on":""}">P</button>
-      <button class="${r.tipo==="C"?"on":""}">C</button>
+      <div class="totals">
+        <div class="totalRow">
+          <span>Total combustível</span>
+          <span class="num" id="totalComb">R$ 0,00</span>
+        </div>
+        <div class="totalRow">
+          <span>Total litros</span>
+          <span class="num" id="totalLitros">0,00 L</span>
+        </div>
+        <div class="totalRow">
+          <span>Total pedágio</span>
+          <span class="num" id="totalPed">R$ 0,00</span>
+        </div>
+        <div class="totalRow" style="padding-top:6px;border-top:1px solid rgba(255,255,255,.10);">
+          <span>Total geral</span>
+          <span class="num" id="totalGeral">R$ 0,00</span>
+        </div>
+      </div>
     </div>
-  </td>
-  <td class="col-valor"><input class="input" placeholder="14,40" value="${r.valor||""}"></td>
-  <td class="col-litros"><input class="input ${r.tipo==="C"?"":"hidden"}" placeholder="Litros" value="${r.litros||""}"></td>
-  <td class="cell-actions"><button class="icon-btn del">✕</button></td>
-  `;
+  </div>
 
-  const inputs=tr.querySelectorAll("input");
-  inputs[0].oninput=e=>{rows[i].local=e.target.value;save();}
-  inputs[1]?.oninput;
-  inputs[2].oninput=e=>{rows[i].valor=e.target.value;save();updateTotals();}
-  inputs[3]?.oninput=e=>{rows[i].litros=e.target.value;save();}
+  <script>
+    // Atualizado com os dados da imagem
+    const DEFAULT_ROWS = [
+      { local: "Seropedica",      tipo: "P", valor: "16,40", litros: "" },
+      { local: "Itatiaia",        tipo: "P", valor: "14,50", litros: "" },
+      { local: "Guaratinguetá",   tipo: "C", valor: "170,31", litros: "37,93" },
+      { local: "Pindamonhangaba", tipo: "P", valor: "16,90", litros: "" },
+      { local: "Jacarei",         tipo: "P", valor: "8,10",  litros: "" },
+      { local: "Guararema",       tipo: "P", valor: "4,50",  litros: "" },
+      { local: "Arujá",           tipo: "P", valor: "4,50",  litros: "" }
+    ];
 
-  const [bP,bC]=tr.querySelectorAll(".seg button");
-  bP.onclick=()=>{rows[i].tipo="P";rows[i].litros="";save();render();}
-  bC.onclick=()=>{rows[i].tipo="C";save();render();}
+    const STORAGE_KEY = "controle_gastos_v3"; // Mudei a chave para não conflitar com a anterior
 
-  tr.querySelector(".del").onclick=()=>{rows.splice(i,1);save();render();}
+    const tbody = document.getElementById("tbody");
+    const totalComb = document.getElementById("totalComb");
+    const totalPed = document.getElementById("totalPed");
+    const totalGeral = document.getElementById("totalGeral");
+    const totalLitros = document.getElementById("totalLitros"); // Elemento novo
+    const btnAdd = document.getElementById("btnAdd");
+    const btnReset = document.getElementById("btnReset");
 
-  tbody.appendChild(tr);
- });
- updateTotals();
-}
+    function deepCopy(obj){
+      return JSON.parse(JSON.stringify(obj));
+    }
 
-function updateTotals(){
- let c=0,p=0;
- rows.forEach(r=>{
-  const v=parseMoney(r.valor);
-  if(r.tipo==="C")c+=v; else p+=v;
- });
- totalComb.textContent=format(c);
- totalPed.textContent=format(p);
- totalGeral.textContent=format(c+p);
-}
+    function loadRows(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return deepCopy(DEFAULT_ROWS);
+        const parsed = JSON.parse(raw);
+        if(!Array.isArray(parsed)) return deepCopy(DEFAULT_ROWS);
+        return parsed.map(r => ({
+          local: (r?.local ?? "").toString(),
+          tipo: ((r?.tipo ?? "P").toString().toUpperCase() === "C") ? "C" : "P",
+          valor: (r?.valor ?? "").toString(),
+          litros: (r?.litros ?? "").toString()
+        }));
+      }catch{
+        return deepCopy(DEFAULT_ROWS);
+      }
+    }
 
-document.getElementById("btnAdd").onclick=()=>{
- rows.push({local:"",tipo:"P",valor:"",litros:""});
- save();render();
-}
+    function saveRows(rows){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+    }
 
-document.getElementById("btnReset").onclick=()=>{
- rows=[...DEFAULT_ROWS];
- save();render();
-}
+    function normalizeMoneyInput(s){
+      s = (s ?? "").toString();
+      s = s.replace(/[^\d,\.]/g, "");
+      const parts = s.split(/[,.]/);
+      if(parts.length === 1) return parts[0];
+      const dec = parts.pop();
+      const int = parts.join("");
+      return int + "," + dec;
+    }
 
-render();
-</script>
+    function parseMoneyBR(s){
+      if(typeof s !== "string") return 0;
+      const t = s.trim();
+      if(!t) return 0;
+
+      const lastComma = t.lastIndexOf(",");
+      const lastDot = t.lastIndexOf(".");
+      let normalized = t;
+
+      if(lastComma > -1 && lastDot > -1){
+        const decIsComma = lastComma > lastDot;
+        normalized = decIsComma
+          ? t.replace(/\./g, "").replace(",", ".")
+          : t.replace(/,/g, "");
+      }else{
+        normalized = t.replace(",", ".");
+      }
+
+      const n = Number(normalized);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatBRL(n){
+      return n.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
+    }
+
+    function formatLitros(n){
+      return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " L";
+    }
+
+    function isZeroLikeMoney(s){
+      const n = parseMoneyBR(s);
+      return !s || s.trim()==="" || n === 0;
+    }
+
+    function makeCellInput({ value, placeholder, inputMode="text" }){
+      const inp = document.createElement("input");
+      inp.className = "input";
+      inp.value = value ?? "";
+      inp.placeholder = placeholder ?? "";
+      inp.inputMode = inputMode;
+      return inp;
+    }
+
+    function setTipo(idx, tipo){
+      rows[idx].tipo = (tipo === "C") ? "C" : "P";
+      if(rows[idx].tipo !== "C"){
+        rows[idx].litros = "";
+      }
+      saveRows(rows);
+      render();
+      updateTotals();
+    }
+
+    function render(){
+      tbody.innerHTML = "";
+
+      rows.forEach((row, idx) => {
+        const tr = document.createElement("tr");
+
+        const tdId = document.createElement("td");
+        tdId.className = "cell-id";
+        tdId.textContent = String(idx + 1);
+
+        const tdLocal = document.createElement("td");
+        tdLocal.className = "col-local";
+        const inLocal = makeCellInput({ value: row.local, placeholder: "Local" });
+        inLocal.addEventListener("input", () => {
+          rows[idx].local = inLocal.value;
+          saveRows(rows);
+        });
+        tdLocal.appendChild(inLocal);
+
+        const tdTipo = document.createElement("td");
+        tdTipo.className = "col-tipo";
+        const seg = document.createElement("div");
+        seg.className = "seg";
+
+        const bP = document.createElement("button");
+        bP.type = "button";
+        bP.textContent = "P";
+        bP.className = (row.tipo === "P") ? "on" : "";
+        bP.addEventListener("click", () => setTipo(idx, "P"));
+
+        const bC = document.createElement("button");
+        bC.type = "button";
+        bC.textContent = "C";
+        bC.className = (row.tipo === "C") ? "on" : "";
+        bC.addEventListener("click", () => setTipo(idx, "C"));
+
+        seg.appendChild(bP);
+        seg.appendChild(bC);
+        tdTipo.appendChild(seg);
+
+        const tdValor = document.createElement("td");
+        tdValor.className = "col-valor";
+        const inValor = makeCellInput({
+          value: row.valor,
+          placeholder: "0,00",
+          inputMode: "decimal"
+        });
+
+        // Se for zero, limpa visualmente se desejar, mas vou manter o value
+        if(isZeroLikeMoney(row.valor) && row.valor === "") inValor.value = "";
+
+        inValor.addEventListener("input", () => {
+          const norm = normalizeMoneyInput(inValor.value);
+          rows[idx].valor = norm;
+          saveRows(rows);
+          updateTotals();
+        });
+
+        tdValor.appendChild(inValor);
+
+        const tdLitros = document.createElement("td");
+        tdLitros.className = "col-litros";
+        const litrosSlot = document.createElement("div");
+        litrosSlot.className = "litrosSlot" + (row.tipo === "C" ? "" : " hidden");
+
+        const inLitros = makeCellInput({
+          value: row.litros,
+          placeholder: "Lts",
+          inputMode: "decimal"
+        });
+
+        inLitros.addEventListener("input", () => {
+          rows[idx].litros = normalizeMoneyInput(inLitros.value);
+          saveRows(rows);
+          updateTotals(); // Atualiza total de litros ao digitar
+        });
+
+        litrosSlot.appendChild(inLitros);
+        tdLitros.appendChild(litrosSlot);
+
+        const tdActions = document.createElement("td");
+        tdActions.className = "cell-actions";
+        const btnDel = document.createElement("button");
+        btnDel.className = "icon-btn del";
+        btnDel.type = "button";
+        btnDel.textContent = "✕";
+        btnDel.addEventListener("click", () => {
+          rows.splice(idx, 1);
+          saveRows(rows);
+          render();
+          updateTotals();
+        });
+        tdActions.appendChild(btnDel);
+
+        tr.appendChild(tdId);
+        tr.appendChild(tdLocal);
+        tr.appendChild(tdTipo);
+        tr.appendChild(tdValor);
+        tr.appendChild(tdLitros);
+        tr.appendChild(tdActions);
+
+        tbody.appendChild(tr);
+      });
+
+      updateTotals();
+    }
+
+    function updateTotals(){
+      let totalC = 0;
+      let totalP = 0;
+      let totalL = 0;
+
+      for(const r of rows){
+        const v = parseMoneyBR(r.valor);
+        const l = parseMoneyBR(r.litros);
+
+        if(r.tipo === "C") {
+          totalC += v;
+          totalL += l;
+        } else {
+          totalP += v;
+        }
+      }
+
+      const geral = totalC + totalP;
+
+      totalComb.textContent = formatBRL(totalC);
+      totalPed.textContent = formatBRL(totalP);
+      totalGeral.textContent = formatBRL(geral);
+      totalLitros.textContent = formatLitros(totalL);
+    }
+
+    btnAdd.addEventListener("click", () => {
+      rows.push({ local:"", tipo:"P", valor:"", litros:"" });
+      saveRows(rows);
+      render();
+      setTimeout(() => {
+        const last = tbody.querySelector("tr:last-child td.col-local input");
+        if(last) last.focus();
+      }, 0);
+    });
+
+    btnReset.addEventListener("click", () => {
+      // Confirmação simples para evitar perda acidental
+      if(confirm("Deseja resetar para os valores padrão da imagem?")){
+        rows = deepCopy(DEFAULT_ROWS);
+        saveRows(rows);
+        render();
+      }
+    });
+
+    let rows = loadRows();
+    render();
+  </script>
 </body>
 </html>
