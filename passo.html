@@ -204,18 +204,17 @@
       align-items:center;
     }
 
-    /* Ajuste visual do seletor para alinhar perfeitamente */
     .seg{
-      display:flex; /* Flex para esticar os botões */
+      display:flex;
       width: 100%;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.05);
       border-radius:10px;
       overflow:hidden;
-      height:36px; /* Altura fixa igual ao input */
+      height:36px;
     }
     .seg button{
-      flex: 1; /* Faz os botões dividirem o espaço igualmente */
+      flex: 1;
       border:none;
       background:transparent;
       padding:0;
@@ -285,7 +284,6 @@
     .totalLabel{ color:var(--muted); font-weight:700; }
     .totalRow .num{ font-variant-numeric: tabular-nums; }
 
-    /* Separador visual para os calculos finais */
     .sep-top{
       padding-top:8px;
       margin-top:2px;
@@ -353,7 +351,6 @@
           <span class="num" id="totalGeral">R$ 0,00</span>
         </div>
         
-        <!-- Novos totais solicitados -->
         <div class="totalRow" style="color:var(--good);">
           <span class="totalLabel" style="color:rgba(29,209,161,.8);">Valor individual (÷7)</span>
           <span class="num" id="valIndividual">R$ 0,00</span>
@@ -368,6 +365,7 @@
   </div>
 
   <script>
+    // Atualizado com o item 20
     const DEFAULT_ROWS = [
       { local: "Seropedica",          tipo: "P", valor: "16,40", litros: "", hora: "" },
       { local: "Itatiaia",            tipo: "P", valor: "14,50", litros: "", hora: "" },
@@ -387,10 +385,11 @@
       { local: "Antonina - PR",       tipo: "C", valor: "182,40", litros: "36,12", hora: "07:35" },
       { local: "Campina Grande",      tipo: "P", valor: "4,30",   litros: "", hora: "08:03" },
       { local: "Lapa",                tipo: "P", valor: "12,30",  litros: "", hora: "11:05" },
-      { local: "Rio Sul - PR",        tipo: "C", valor: "165,02", litros: "34,45", hora: "13:35" }
+      { local: "Rio Sul - PR",        tipo: "C", valor: "165,02", litros: "34,45", hora: "13:35" },
+      { local: "Severiano de Almeida - RS", tipo: "C", valor: "168,28", litros: "33,06", hora: "17:51" }
     ];
 
-    const STORAGE_KEY = "controle_gastos_v7"; // Atualizado para v7
+    const STORAGE_KEY = "controle_gastos_v8"; // Atualizado para v8
 
     const tbody = document.getElementById("tbody");
     
