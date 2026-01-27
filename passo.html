@@ -365,7 +365,7 @@
   </div>
 
   <script>
-    // Atualizado com o item 20
+    // Lista completa atualizada ate o item 33
     const DEFAULT_ROWS = [
       { local: "Seropedica",          tipo: "P", valor: "16,40", litros: "", hora: "" },
       { local: "Itatiaia",            tipo: "P", valor: "14,50", litros: "", hora: "" },
@@ -386,14 +386,28 @@
       { local: "Campina Grande",      tipo: "P", valor: "4,30",   litros: "", hora: "08:03" },
       { local: "Lapa",                tipo: "P", valor: "12,30",  litros: "", hora: "11:05" },
       { local: "Rio Sul - PR",        tipo: "C", valor: "165,02", litros: "34,45", hora: "13:35" },
-      { local: "Severiano de Almeida - RS", tipo: "C", valor: "168,28", litros: "33,06", hora: "17:51" }
+      { local: "Severiano de Almeida - RS", tipo: "C", valor: "168,28", litros: "33,06", hora: "17:51" },
+      
+      // Novos itens 21-33
+      { local: "Passo Fundo 1",       tipo: "C", valor: "136,21", litros: "26,76", hora: "13:26" },
+      { local: "Passo Fundo 2",       tipo: "C", valor: "180,00", litros: "36,17", hora: "11:40" },
+      { local: "Passo fundo 3",       tipo: "C", valor: "140,83", litros: "28,22", hora: "22:14" },
+      { local: "Passo fundo 4",       tipo: "C", valor: "197,54", litros: "38,81", hora: "14:34" },
+      { local: "Ida Gram. - Garib",   tipo: "C", valor: "147,45", litros: "28,97", hora: "09:04" },
+      { local: "São Vedelino",        tipo: "P", valor: "9,00",   litros: "",      hora: "09:10" },
+      { local: "Gramado",             tipo: "P", valor: "7,10",   litros: "",      hora: "11:29" },
+      { local: "Gramado 2",           tipo: "C", valor: "124,66", litros: "23,89", hora: "" },
+      { local: "Volta rj - Grama",    tipo: "P", valor: "7,10",   litros: "",      hora: "12:07" },
+      { local: "Tres cachoeiras",     tipo: "P", valor: "5,50",   litros: "",      hora: "13:53" },
+      { local: "São Joao do Sul",     tipo: "P", valor: "2,40",   litros: "",      hora: "14:31" },
+      { local: "Ararangua",           tipo: "P", valor: "2,40",   litros: "",      hora: "15:03" },
+      { local: "Maracajá",            tipo: "C", valor: "159,08", litros: "31,88", hora: "15:13" }
     ];
 
-    const STORAGE_KEY = "controle_gastos_v8"; // Atualizado para v8
+    const STORAGE_KEY = "controle_gastos_v9"; // Versao 9 para forçar atualização
 
     const tbody = document.getElementById("tbody");
     
-    // Elementos de totais
     const totalComb = document.getElementById("totalComb");
     const totalPed = document.getElementById("totalPed");
     const totalGeral = document.getElementById("totalGeral");
@@ -631,7 +645,6 @@
 
       const geral = totalC + totalP;
       
-      // Calculos extras
       const porPessoa = geral / 7;
       const porCasal = porPessoa * 2;
 
