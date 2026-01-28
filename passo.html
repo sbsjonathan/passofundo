@@ -365,7 +365,7 @@
   </div>
 
   <script>
-    // Lista completa atualizada ate o item 33
+    // Lista completa atualizada com itens 34-43
     const DEFAULT_ROWS = [
       { local: "Seropedica",          tipo: "P", valor: "16,40", litros: "", hora: "" },
       { local: "Itatiaia",            tipo: "P", valor: "14,50", litros: "", hora: "" },
@@ -387,8 +387,6 @@
       { local: "Lapa",                tipo: "P", valor: "12,30",  litros: "", hora: "11:05" },
       { local: "Rio Sul - PR",        tipo: "C", valor: "165,02", litros: "34,45", hora: "13:35" },
       { local: "Severiano de Almeida - RS", tipo: "C", valor: "168,28", litros: "33,06", hora: "17:51" },
-      
-      // Novos itens 21-33
       { local: "Passo Fundo 1",       tipo: "C", valor: "136,21", litros: "26,76", hora: "13:26" },
       { local: "Passo Fundo 2",       tipo: "C", valor: "180,00", litros: "36,17", hora: "11:40" },
       { local: "Passo fundo 3",       tipo: "C", valor: "140,83", litros: "28,22", hora: "22:14" },
@@ -401,10 +399,22 @@
       { local: "Tres cachoeiras",     tipo: "P", valor: "5,50",   litros: "",      hora: "13:53" },
       { local: "São Joao do Sul",     tipo: "P", valor: "2,40",   litros: "",      hora: "14:31" },
       { local: "Ararangua",           tipo: "P", valor: "2,40",   litros: "",      hora: "15:03" },
-      { local: "Maracajá",            tipo: "C", valor: "159,08", litros: "31,88", hora: "15:13" }
+      { local: "Maracajá",            tipo: "C", valor: "159,08", litros: "31,88", hora: "15:13" },
+
+      // Novos itens 34-43
+      { local: "Tubarão",             tipo: "P", valor: "2,40",   litros: "",      hora: "16:11" },
+      { local: "Laguna",              tipo: "P", valor: "2,40",   litros: "",      hora: "16:41" },
+      { local: "Palhoça",             tipo: "P", valor: "5,70",   litros: "",      hora: "17:16" },
+      { local: "Porto belo",          tipo: "P", valor: "5,70",   litros: "",      hora: "18:16" },
+      { local: "Itapema",             tipo: "C", valor: "164,47", litros: "33,09", hora: "18:51" },
+      { local: "Joinvile",            tipo: "P", valor: "5,70",   litros: "",      hora: "20:22" },
+      { local: "Garuva",              tipo: "P", valor: "5,70",   litros: "",      hora: "21:13" },
+      { local: "S. J. Pinhais",       tipo: "P", valor: "5,70",   litros: "",      hora: "22:00" },
+      { local: "Camp. Grande S",      tipo: "P", valor: "4,30",   litros: "",      hora: "22:42" },
+      { local: "Camp. G. Sul",        tipo: "C", valor: "153,08", litros: "32,68", hora: "23:00" }
     ];
 
-    const STORAGE_KEY = "controle_gastos_v9"; // Versao 9 para forçar atualização
+    const STORAGE_KEY = "controle_gastos_v10"; // Atualizado para v10
 
     const tbody = document.getElementById("tbody");
     
